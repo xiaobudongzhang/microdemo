@@ -5,6 +5,7 @@ import (
 
 	log "github.com/micro/go-micro/v2/logger"
 
+	us "user-srv/model/user"
 	user "user-srv/proto/user"
 )
 
@@ -45,4 +46,35 @@ func (e *User) PingPong(ctx context.Context, stream user.User_PingPongStream) er
 			return err
 		}
 	}
+}
+
+var (
+	userService us.Service
+)
+
+func Init() {
+	var err error
+	userService, err = us.GetService()
+	if err != nil {
+		log.Fatal("初始化handler失败")
+		return
+	}
+}
+
+func (e *User) QueryUserByName(ctx context.Context, req *user.UserRequest, rsp *user.UserResponse) error {
+
+	result, err := userService.QueryUserByName(req.UserName)
+
+	if err != nil {
+		rsp.Success = false
+		rsp.Error = &user.Error{
+			Code:   500,
+			Detail: err.Error(),
+		}
+		return nil
+	}
+
+	rsp.User = result
+	rsp.Success = true
+	return nil
 }

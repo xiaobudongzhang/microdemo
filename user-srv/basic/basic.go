@@ -1,8 +1,11 @@
 package basic
 
-import "fmt"
+import (
+	"user-srv/basic/config"
+	"user-srv/basic/db"
+)
 
 func Init() {
-	fmt.Println("hello")
-	//config.Init()
+	config.Init()
+	db.Init()
 }

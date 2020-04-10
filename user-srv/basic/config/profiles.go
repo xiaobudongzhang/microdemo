@@ -8,6 +8,6 @@ type defaultProfiles struct {
 	Include string `json:"include"`
 }
 
-func (p deaultProfiles) GetInclude() string {
+func (p defaultProfiles) GetInclude() string {
 	return p.Include
 }

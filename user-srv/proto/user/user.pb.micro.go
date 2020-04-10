@@ -38,6 +38,7 @@ type UserService interface {
 	Call(ctx context.Context, in *Request, opts ...client.CallOption) (*Response, error)
 	Stream(ctx context.Context, in *StreamingRequest, opts ...client.CallOption) (User_StreamService, error)
 	PingPong(ctx context.Context, opts ...client.CallOption) (User_PingPongService, error)
+	QueryUserByName(ctx context.Context, in *UserRequest, opts ...client.CallOption) (*UserResponse, error)
 }
 
 type userService struct {
@@ -158,12 +159,23 @@ func (x *userServicePingPong) Recv() (*Pong, error) {
 	return m, nil
 }
 
+func (c *userService) QueryUserByName(ctx context.Context, in *UserRequest, opts ...client.CallOption) (*UserResponse, error) {
+	req := c.c.NewRequest(c.name, "User.QueryUserByName", in)
+	out := new(UserResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for User service
 
 type UserHandler interface {
 	Call(context.Context, *Request, *Response) error
 	Stream(context.Context, *StreamingRequest, User_StreamStream) error
 	PingPong(context.Context, User_PingPongStream) error
+	QueryUserByName(context.Context, *UserRequest, *UserResponse) error
 }
 
 func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.HandlerOption) error {
@@ -171,6 +183,7 @@ func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.Handl
 		Call(ctx context.Context, in *Request, out *Response) error
 		Stream(ctx context.Context, stream server.Stream) error
 		PingPong(ctx context.Context, stream server.Stream) error
+		QueryUserByName(ctx context.Context, in *UserRequest, out *UserResponse) error
 	}
 	type User struct {
 		user
@@ -260,4 +273,8 @@ func (x *userPingPongStream) Recv() (*Ping, error) {
 		return nil, err
 	}
 	return m, nil
+}
+
+func (h *userHandler) QueryUserByName(ctx context.Context, in *UserRequest, out *UserResponse) error {
+	return h.UserHandler.QueryUserByName(ctx, in, out)
 }
