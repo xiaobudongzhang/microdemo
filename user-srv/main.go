@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"user-srv/basic/config"
 	"user-srv/handler"
 	"user-srv/model"
 	"user-srv/subscriber"
@@ -11,18 +13,21 @@ import (
 
 	"github.com/micro/cli/v2"
 	"github.com/micro/go-micro/v2"
-	log "github.com/micro/go-micro/v2/logger"
+	"github.com/micro/go-micro/v2/registry/etcd"
+	log "github.com/micro/go-micro/v2/util/log"
+
+	"github.com/micro/go-micro/v2/registry"
 )
 
 func main() {
 	basic.Init()
 
 	// 使用etcd注册
-	//micReg := etcd.NewRegistry(registryOptions)
+	micReg := etcd.NewRegistry(registryOptions)
 	// New Service
 	service := micro.NewService(
 		micro.Name("mu.micro.book.service.user"),
-		//micro.Registry(micReg),
+		micro.Registry(micReg),
 		micro.Version("latest"),
 	)
 
@@ -50,8 +55,7 @@ func main() {
 	}
 }
 
-//func registryOptions(ops *registry.Options) {
-//	etcdCfg := config.GetEtcdConfig()
-//	fmt.Println(fmt.Sprintf("%s:%d", etcdCfg.GetHost(), etcdCfg.GetPort()))
-//	ops.Addrs = []string{fmt.Sprintf("%s:%d", etcdCfg.GetHost(), etcdCfg.GetPort())}
-//}
+func registryOptions(ops *registry.Options) {
+	etcdCfg := config.GetEtcdConfig()
+	ops.Addrs = []string{fmt.Sprintf("%s:%d", etcdCfg.GetHost(), etcdCfg.GetPort())}
+}
