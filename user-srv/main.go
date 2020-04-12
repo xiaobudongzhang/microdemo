@@ -7,7 +7,7 @@ import (
 	"user-srv/model"
 	"user-srv/subscriber"
 
-	"user-srv/basic"
+	"github.com/xiaobudongzhang/microdemo/basic"
 
 	s "user-srv/proto/user"
 
